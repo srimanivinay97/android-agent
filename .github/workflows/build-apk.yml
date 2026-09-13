@@ -6,6 +6,9 @@ on:
     branches:
       - main
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -35,8 +38,22 @@ jobs:
           KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
         run: gradle assembleRelease
 
-      - name: Upload signed APK
+      - name: Rename APK
+        run: |
+          cp app/build/outputs/apk/release/app-release.apk Android-Agent.apk
+
+      - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
           name: android-agent-release
-          path: app/build/outputs/apk/release/app-release.apk
+          path: Android-Agent.apk
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create "build-${{ github.run_number }}" \
+            Android-Agent.apk \
+            --repo "${{ github.repository }}" \
+            --title "Android Agent 1.0.${{ github.run_number }}" \
+            --notes "Automatic Android Agent build from commit ${{ github.sha }}"
