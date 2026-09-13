@@ -5,7 +5,9 @@ plugins {
 android {
     namespace = "com.vinay.androidagent"
     compileSdk = 36
-
+    buildFeatures {
+        resValues = true
+    }
     defaultConfig {
     applicationId = "com.vinay.androidagent"
     minSdk = 23
