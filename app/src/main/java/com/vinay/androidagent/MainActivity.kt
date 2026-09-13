@@ -1,7 +1,9 @@
 package com.vinay.androidagent
 
 import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
+import android.provider.Settings
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
@@ -18,9 +20,14 @@ class MainActivity : Activity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val commandInput = findViewById<EditText>(R.id.commandInput)
-        val sendButton = findViewById<Button>(R.id.sendButton)
-        val resultText = findViewById<TextView>(R.id.resultText)
+        val commandInput =
+            findViewById<EditText>(R.id.commandInput)
+
+        val sendButton =
+            findViewById<Button>(R.id.sendButton)
+
+        val resultText =
+            findViewById<TextView>(R.id.resultText)
 
         sendButton.setOnClickListener {
 
@@ -36,6 +43,7 @@ class MainActivity : Activity() {
                         url.openConnection() as HttpURLConnection
 
                     connection.requestMethod = "POST"
+
                     connection.setRequestProperty(
                         "Content-Type",
                         "application/json"
@@ -51,7 +59,6 @@ class MainActivity : Activity() {
                     )
 
                     connection.outputStream.use {
-
                         it.write(
                             requestJson
                                 .toString()
@@ -64,23 +71,77 @@ class MainActivity : Activity() {
                             .bufferedReader()
                             .readText()
 
+                    val actionJson =
+                        JSONObject(response)
+
                     runOnUiThread {
 
-                        resultText.text = response
+                        resultText.text =
+                            actionJson.toString(2)
 
+                        executeAction(actionJson)
                     }
 
                 } catch (e: Exception) {
 
                     runOnUiThread {
-
                         resultText.text =
                             "ERROR: ${e.message}"
-
                     }
-
                 }
+
             }.start()
+        }
+    }
+
+    private fun executeAction(actionJson: JSONObject) {
+
+        val service =
+            AgentAccessibilityService.instance
+
+        if (service == null) {
+
+            val intent =
+                Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)
+
+            startActivity(intent)
+
+            return
+        }
+
+        when (actionJson.optString("action")) {
+
+            "open_app" -> {
+
+                val app =
+                    actionJson.optString("app")
+
+                val success =
+                    service.openApp(app)
+
+                if (!success) {
+                    findViewById<TextView>(R.id.resultText).text =
+                        "Could not open app: $app"
+                }
+            }
+
+            "back" -> {
+                service.goBack()
+            }
+
+            "home" -> {
+                service.goHome()
+            }
+
+            "done" -> {
+                // Nothing to execute
+            }
+
+            else -> {
+
+                findViewById<TextView>(R.id.resultText).text =
+                    "Unsupported action: ${actionJson.optString("action")}"
+            }
         }
     }
 }
