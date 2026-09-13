@@ -16,6 +16,12 @@ android {
 
     versionCode = buildNumber
     versionName = "1.0.$buildNumber"
+
+    val repo =
+    System.getenv("GITHUB_REPOSITORY")
+        ?: "YOUR_GITHUB_USERNAME/android-agent"
+
+resValue("string", "github_repository", repo)
 }
 
     signingConfigs {
@@ -33,4 +39,7 @@ android {
             signingConfig = signingConfigs.getByName("release")
         }
     }
+}
+dependencies {
+    implementation("androidx.core:core-ktx:1.17.0")
 }

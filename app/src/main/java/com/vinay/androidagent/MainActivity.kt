@@ -19,7 +19,7 @@ class MainActivity : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
+        AppUpdater(this).checkForUpdate()
         val commandInput =
             findViewById<EditText>(R.id.commandInput)
 
