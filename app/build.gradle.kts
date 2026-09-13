@@ -9,11 +9,8 @@ android {
 
     defaultConfig {
         applicationId = "com.vinay.androidagent"
-
-        // Redmi 9i is old enough that we keep this low.
         minSdk = 23
         targetSdk = 36
-
         versionCode = 1
         versionName = "1.0"
     }
