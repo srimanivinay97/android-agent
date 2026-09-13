@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Android Agent</string>
+
+    <string name="accessibility_service_description">
+        Allows Android Agent to inspect and control the device interface.
+    </string>
+</resources>
