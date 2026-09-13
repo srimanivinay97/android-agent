@@ -13,7 +13,20 @@ android {
         versionCode = 1
         versionName = "1.0"
     }
-}
 
-dependencies {
+    signingConfigs {
+        create("release") {
+            storeFile = file("android-agent-release.jks")
+            storePassword = System.getenv("KEYSTORE_PASSWORD")
+            keyAlias = System.getenv("KEY_ALIAS")
+            keyPassword = System.getenv("KEYSTORE_PASSWORD")
+        }
+    }
+
+    buildTypes {
+        getByName("release") {
+            isMinifyEnabled = false
+            signingConfig = signingConfigs.getByName("release")
+        }
+    }
 }
